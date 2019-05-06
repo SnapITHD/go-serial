@@ -68,6 +68,10 @@ func IsStandardBaudRate(baudRate uint) bool { return StandardBaudRates[baudRate]
 // OpenOptions is the struct containing all of the options necessary for
 // opening a serial port.
 type OpenOptions struct {
+	// Option
+	openFlag int
+	flagSet bool
+
 	// The name of the port, e.g. "/dev/tty.usbserial-A8008HlV".
 	PortName string
 
@@ -127,8 +131,7 @@ type OpenOptions struct {
 	//     available. The inter-character timer is not used.
 	//
 	// For windows usage, these options (termios) do not conform well to the
-	//     windows serial port / comms abstractions.  Please see the code in
-	//		 open_windows setCommTimeouts function for full documentation.
+	//     windows serial port / comms abstractions.  Please see the code 	//		 open_windows setCommTimeouts function for full documentation.
 	//   	 Summary:
 	//			Setting MinimumReadSize > 0 will cause the serialPort to block until
 	//			until data is available on the port.
@@ -158,6 +161,15 @@ type OpenOptions struct {
 	// RTS delay after send
 	Rs485DelayRtsAfterSend int
 }
+
+// SetOpenFlag sets the open flag options, flag should be either os.O_RDONLY, os.O_WRONLY, O_RDWR
+func (options *OpenOptions) SetOpenFlag(flag int) {
+	options.openFlag = flag
+	options.flagSet = true
+}
+
+func (options *OpenOptions) GetOpenFlag() (flag int) {return options.openFlag}
+
 
 // Open creates an io.ReadWriteCloser based on the supplied options struct.
 func Open(options OpenOptions) (io.ReadWriteCloser, error) {

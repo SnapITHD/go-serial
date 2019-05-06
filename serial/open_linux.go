@@ -139,12 +139,23 @@ func makeTermios2(options OpenOptions) (*termios2, error) {
 }
 
 func openInternal(options OpenOptions) (io.ReadWriteCloser, error) {
+	var file *os.File
+	var openErr error
 
-	file, openErr :=
-		os.OpenFile(
+	if options.flagSet {
+		file, openErr =
+			os.OpenFile(
+			options.PortName,
+			options.openFlag|syscall.O_NOCTTY|syscall.O_NONBLOCK,
+			0600)
+
+	} else {
+		file, openErr =
+			os.OpenFile(
 			options.PortName,
 			syscall.O_RDWR|syscall.O_NOCTTY|syscall.O_NONBLOCK,
 			0600)
+	}
 	if openErr != nil {
 		return nil, openErr
 	}
